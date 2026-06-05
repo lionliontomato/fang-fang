@@ -16,8 +16,8 @@ const palette = [
 ];
 
 function cell(row, i) {
-const c = row?.c?.[i];
-return c ? String(c.f ?? c.v ?? '').trim() : '';
+const c = row && row.c ? row.c[i] : null;
+return c ? String(c.f || c.v || '').trim() : '';
 }
 
 function parseTags(text) {
@@ -43,11 +43,11 @@ clearTimeout(sheetTimeout);
 
 ```
 try {
-  const rows = response?.table?.rows || [];
+  const rows = response && response.table && response.table.rows ? response.table.rows : [];
   const loadedSongs = [];
   const masterTags = [];
 
-  rows.forEach((row) => {
+  rows.forEach(row => {
     const title = cell(row, 0);
     const artist = cell(row, 1);
     const category = cell(row, 2);
@@ -60,7 +60,7 @@ try {
 
     if (title && !looksLikeHeader) {
       loadedSongs.push({
-        title,
+        title: title,
         artist: artist || '未填歌手',
         category: category || '未分類',
         link: /^https?:\/\//i.test(link) ? link : ''
@@ -97,7 +97,7 @@ const script = document.createElement('script');
 script.id = 'sheetJsonp';
 script.src = url;
 
-script.onerror = () => {
+script.onerror = function() {
 clearTimeout(sheetTimeout);
 showSheetError('讀取不到試算表，請確認共用權限是「知道連結的任何人可檢視」。');
 delete window[callbackName];
@@ -105,7 +105,7 @@ delete window[callbackName];
 
 document.body.appendChild(script);
 
-sheetTimeout = setTimeout(() => {
+sheetTimeout = setTimeout(function() {
 showSheetError('讀取試算表逾時，請重新整理頁面或確認試算表權限。');
 delete window[callbackName];
 }, 12000);
@@ -124,16 +124,16 @@ const box = document.getElementById('tags');
 box.innerHTML = '';
 
 tags.forEach((t, i) => {
-const [dark, light] = palette[i % palette.length];
+const colors = palette[i % palette.length];
 const b = document.createElement('button');
 
 ```
 b.className = 'tag' + (activeTag === t ? ' active' : '');
 b.textContent = t;
-b.style.setProperty('--tag', dark);
-b.style.setProperty('--tagLight', light);
+b.style.setProperty('--tag', colors[0]);
+b.style.setProperty('--tagLight', colors[1]);
 
-b.onclick = () => {
+b.onclick = function() {
   activeTag = activeTag === t ? null : t;
   renderTags();
   renderSongs();
@@ -166,7 +166,7 @@ const list = songs.filter(matchSong);
 count.textContent = `共 ${list.length} 首 / 全部 ${songs.length} 首`;
 empty.style.display = list.length ? 'none' : 'block';
 
-list.forEach((s) => {
+list.forEach(s => {
 const card = document.createElement('article');
 card.className = 'card';
 card.dataset.title = s.title;
@@ -189,7 +189,7 @@ copy.className = 'copy';
 copy.type = 'button';
 copy.textContent = '📋 複製';
 
-copy.onclick = async () => {
+copy.onclick = async function() {
   const text = `${s.title} - ${s.artist}`;
 
   try {
@@ -208,7 +208,7 @@ copy.onclick = async () => {
   copy.textContent = '✓ 已複製';
   copy.classList.add('done');
 
-  setTimeout(() => {
+  setTimeout(function() {
     copy.textContent = '📋 複製';
     copy.classList.remove('done');
   }, 1300);
@@ -217,7 +217,9 @@ copy.onclick = async () => {
 card.append(title, artist, cat, copy);
 
 if (s.link) {
-  card.addEventListener('dblclick', () => window.open(s.link, '_blank', 'noopener,noreferrer'));
+  card.addEventListener('dblclick', function() {
+    window.open(s.link, '_blank', 'noopener,noreferrer');
+  });
   card.title = '雙擊開啟歌曲連結';
 }
 
@@ -227,12 +229,12 @@ grid.appendChild(card);
 });
 }
 
-document.getElementById('search').addEventListener('input', e => {
+document.getElementById('search').addEventListener('input', function(e) {
 query = e.target.value;
 renderSongs();
 });
 
-document.getElementById('randomBtn').onclick = (e) => {
+document.getElementById('randomBtn').onclick = function(e) {
 e.preventDefault();
 
 const list = songs.filter(matchSong);
@@ -246,11 +248,11 @@ document.getElementById('pickArtist').textContent = `${s.artist}｜${parseTags(s
 document.getElementById('modal').classList.add('show');
 };
 
-document.getElementById('closeModal').onclick = () => {
+document.getElementById('closeModal').onclick = function() {
 document.getElementById('modal').classList.remove('show');
 };
 
-document.getElementById('modal').onclick = e => {
+document.getElementById('modal').onclick = function(e) {
 if (e.target.id === 'modal') {
 e.currentTarget.classList.remove('show');
 }
