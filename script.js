@@ -46,7 +46,6 @@ function loadSheet() {
       const masterTags = [];
 
       rows.forEach((row, index) => {
-        // A欄：歌名、B欄：歌手、C欄：歌曲分類/標籤、D欄：連結(可空)、F欄：按鈕標籤清單
         const title = cell(row, 0);
         const artist = cell(row, 1);
         const category = cell(row, 2);
@@ -55,7 +54,6 @@ function loadSheet() {
 
         parseTags(masterTagCell).forEach(t => masterTags.push(t));
 
-        // 跳過表頭與空白列；只要 A 欄有歌名就讀取，避免漏歌
         const looksLikeHeader = ['歌名','歌曲','曲名','title'].includes(title.toLowerCase());
         if (title && !looksLikeHeader) {
           loadedSongs.push({
@@ -69,7 +67,6 @@ function loadSheet() {
 
       songs = loadedSongs;
 
-      // F欄控制按鈕；若 F 欄沒有內容，才用 C 欄分類自動產生按鈕
       if (masterTags.length) {
         tags = [...new Set(masterTags)];
       } else {
@@ -168,7 +165,7 @@ function renderSongs() {
 
     const cat = document.createElement('span');
     cat.className = 'cat';
-    cat.textContent = s.category || '未分類';
+    cat.textContent = parseTags(s.category).join('　') || '未分類';
 
     const copy = document.createElement('button');
     copy.className = 'copy';
@@ -212,7 +209,6 @@ document.getElementById('search').addEventListener('input', e => {
 });
 
 document.getElementById('randomBtn').onclick = () => {
-  // 沒有選標籤時：抽全部歌曲；有選標籤時：抽目前標籤加搜尋結果中的歌曲
   const list = activeTag ? songs.filter(matchSong) : songs.filter(s => {
     const q = query.trim().toLowerCase();
     const text = `${s.title} ${s.artist} ${s.category}`.toLowerCase();
@@ -223,7 +219,7 @@ document.getElementById('randomBtn').onclick = () => {
 
   const s = list[Math.floor(Math.random() * list.length)];
   document.getElementById('pickSong').textContent = s.title;
-  document.getElementById('pickArtist').textContent = `${s.artist}｜${s.category || '未分類'}`;
+  document.getElementById('pickArtist').textContent = `${s.artist}｜${parseTags(s.category).join('　') || '未分類'}`;
   document.getElementById('modal').classList.add('show');
 
   setTimeout(() => {
