@@ -1,3 +1,4 @@
+```js
 const SHEET_ID = '1-4mY86ruT2HnTWpPI9MJ9MYPWVTE_Yi3Zoe3PZIMSbs';
 const SHEET_GID = '0';
 
@@ -45,7 +46,7 @@ function loadSheet() {
       const loadedSongs = [];
       const masterTags = [];
 
-      rows.forEach((row, index) => {
+      rows.forEach((row) => {
         const title = cell(row, 0);
         const artist = cell(row, 1);
         const category = cell(row, 2);
@@ -218,19 +219,10 @@ document.getElementById('randomBtn').onclick = () => {
   if (!list.length) return;
 
   const s = list[Math.floor(Math.random() * list.length)];
+
   document.getElementById('pickSong').textContent = s.title;
   document.getElementById('pickArtist').textContent = `${s.artist}｜${parseTags(s.category).join('　') || '未分類'}`;
   document.getElementById('modal').classList.add('show');
-
-  setTimeout(() => {
-    document.querySelectorAll('.card').forEach(c => {
-      if (c.dataset.title === s.title) {
-        c.classList.add('picked');
-        c.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => c.classList.remove('picked'), 1600);
-      }
-    });
-  }, 80);
 };
 
 document.getElementById('closeModal').onclick = () => document.getElementById('modal').classList.remove('show');
@@ -253,3 +245,4 @@ document.getElementById('modal').onclick = e => {
 })();
 
 loadSheet();
+```
