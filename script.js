@@ -1,4 +1,4 @@
-```js
+js
 const SHEET_ID = '1-4mY86ruT2HnTWpPI9MJ9MYPWVTE_Yi3Zoe3PZIMSbs';
 const SHEET_GID = '0';
 
