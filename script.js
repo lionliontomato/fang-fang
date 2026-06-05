@@ -36,7 +36,7 @@ const oldScript = document.getElementById('sheetJsonp');
 if (oldScript) oldScript.remove();
 
 const callbackName = 'playlistSheetCallback_' + Date.now();
-const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${SHEET_GID}&tqx=out:json;responseHandler:${callbackName}&t=${Date.now()}`;
+const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?gid=' + SHEET_GID + '&tqx=out:json;responseHandler:' + callbackName + '&t=' + Date.now();
 
 window[callbackName] = function(response) {
 clearTimeout(sheetTimeout);
@@ -47,14 +47,16 @@ try {
   const loadedSongs = [];
   const masterTags = [];
 
-  rows.forEach(row => {
+  rows.forEach(function(row) {
     const title = cell(row, 0);
     const artist = cell(row, 1);
     const category = cell(row, 2);
     const link = cell(row, 3);
     const masterTagCell = cell(row, 5);
 
-    parseTags(masterTagCell).forEach(t => masterTags.push(t));
+    parseTags(masterTagCell).forEach(function(t) {
+      masterTags.push(t);
+    });
 
     const looksLikeHeader = ['歌名','歌曲','曲名','title'].includes(title.toLowerCase());
 
@@ -71,11 +73,15 @@ try {
   songs = loadedSongs;
 
   if (masterTags.length) {
-    tags = [...new Set(masterTags)];
+    tags = Array.from(new Set(masterTags));
   } else {
     const fromSongs = [];
-    songs.forEach(s => parseTags(s.category).forEach(t => fromSongs.push(t)));
-    tags = [...new Set(fromSongs)];
+    songs.forEach(function(s) {
+      parseTags(s.category).forEach(function(t) {
+        fromSongs.push(t);
+      });
+    });
+    tags = Array.from(new Set(fromSongs));
   }
 
   status.textContent = '';
@@ -123,7 +129,7 @@ function renderTags() {
 const box = document.getElementById('tags');
 box.innerHTML = '';
 
-tags.forEach((t, i) => {
+tags.forEach(function(t, i) {
 const colors = palette[i % palette.length];
 const b = document.createElement('button');
 
@@ -148,7 +154,7 @@ box.appendChild(b);
 function matchSong(s) {
 const q = query.trim().toLowerCase();
 const categories = parseTags(s.category);
-const text = `${s.title} ${s.artist} ${s.category}`.toLowerCase();
+const text = (s.title + ' ' + s.artist + ' ' + s.category).toLowerCase();
 const tagOk = !activeTag || categories.includes(activeTag) || s.artist === activeTag || s.category.includes(activeTag);
 
 return tagOk && (!q || text.includes(q));
@@ -163,10 +169,10 @@ grid.innerHTML = '';
 
 const list = songs.filter(matchSong);
 
-count.textContent = `共 ${list.length} 首 / 全部 ${songs.length} 首`;
+count.textContent = '共 ' + list.length + ' 首 / 全部 ' + songs.length + ' 首';
 empty.style.display = list.length ? 'none' : 'block';
 
-list.forEach(s => {
+list.forEach(function(s) {
 const card = document.createElement('article');
 card.className = 'card';
 card.dataset.title = s.title;
@@ -190,7 +196,7 @@ copy.type = 'button';
 copy.textContent = '📋 複製';
 
 copy.onclick = async function() {
-  const text = `${s.title} - ${s.artist}`;
+  const text = s.title + ' - ' + s.artist;
 
   try {
     await navigator.clipboard.writeText(text);
@@ -244,7 +250,7 @@ if (!list.length) return;
 const s = list[Math.floor(Math.random() * list.length)];
 
 document.getElementById('pickSong').textContent = s.title;
-document.getElementById('pickArtist').textContent = `${s.artist}｜${parseTags(s.category).join('　') || '未分類'}`;
+document.getElementById('pickArtist').textContent = s.artist + '｜' + (parseTags(s.category).join('　') || '未分類');
 document.getElementById('modal').classList.add('show');
 };
 
