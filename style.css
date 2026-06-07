@@ -176,31 +176,48 @@ body:before{
   transform:translateY(-2px);
 }
 
+/* Tomato 風格分類區 */
+
 .filter-box{
   width:100%;
   margin:8px 0 22px;
-  padding:20px;
+  padding:18px;
   border-radius:28px;
   background:rgba(255,255,255,.45);
   border:1px solid rgba(255,255,255,.65);
   box-shadow:0 10px 26px rgba(64,89,105,.08);
 }
 
-.filter-group{
-  width:100%;
+.type-tabs{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
   margin-bottom:18px;
-  text-align:left;
 }
 
-.filter-group:last-of-type{
-  margin-bottom:16px;
+.type-tab{
+  border:0;
+  border-radius:999px;
+  padding:11px 20px;
+  background:rgba(255,255,255,.82);
+  color:#526b78;
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow:0 9px 18px rgba(64,89,105,.08);
+  transition:.22s;
 }
 
-.filter-group h3{
-  margin:0 0 10px;
-  color:var(--blue-900);
-  font-size:16px;
-  letter-spacing:.08em;
+.type-tab:hover{
+  transform:translateY(-2px);
+  box-shadow:0 13px 26px rgba(64,89,105,.14);
+}
+
+.type-tab.active{
+  background:linear-gradient(135deg,#6f8795,#506a7a);
+  color:white;
+  box-shadow:0 15px 28px rgba(64,89,105,.25);
 }
 
 .tags{
@@ -211,7 +228,8 @@ body:before{
 }
 
 .filter-box .tags{
-  margin:0;
+  justify-content:center;
+  margin:0 0 18px;
 }
 
 .tag{
@@ -456,8 +474,13 @@ body:before{
     padding:16px 14px;
   }
 
-  .filter-group h3{
-    text-align:center;
+  .type-tabs{
+    gap:9px;
+  }
+
+  .type-tab{
+    padding:10px 15px;
+    font-size:14px;
   }
 
   .filter-box .tags{
