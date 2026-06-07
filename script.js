@@ -1,11 +1,9 @@
 const SHEET_ID = '1-4mY86ruT2HnTWpPI9MJ9MYPWVTE_Yi3Zoe3PZIMSbs';
 const SHEET_GID = '0';
 
-const TAG_TYPES = ['分類', '歌手', '風格', '語言', '其他'];
-
 let songs = [];
-let activeType = '分類';
-let activeValue = null;
+let tags = [];
+let activeTag = null;
 let query = '';
 let sheetTimeout = null;
 
@@ -13,7 +11,8 @@ const palette = [
   ['#6f8795','#edf3f5'],['#7f9aaa','#eef5f4'],['#8da0b6','#f0f3f8'],
   ['#78918b','#eef4f1'],['#a18f99','#f6f1f4'],['#9b947e','#f5f2ea'],
   ['#8393a0','#eef2f5'],['#7795a3','#edf5f7'],['#8f98aa','#f3f4ee'],
-  ['#9a8e88','#f6f1ed'],['#7189a8','#edf1f8'],['#6d9a98','#edf6f5']
+  ['#9a8e88','#f6f1ed'],['#7189a8','#edf1f8'],['#6d9a98','#edf6f5'],
+  ['#907f9d','#f3eff6'],['#ad928f','#f8f1f0'],['#8ca0a6','#edf3f5']
 ];
 
 function cell(row, i) {
@@ -25,41 +24,8 @@ function parseTags(text) {
   return String(text || '')
     .replace(/[｜|／\/;；、，\n\r]/g, ',')
     .split(',')
-    .map(t => t.trim())
-    .filter(t => t && t !== '-' && t !== '—');
-}
-
-function buildTagMap(typeText, valueText, category, artist) {
-  const tagMap = {};
-  TAG_TYPES.forEach(t => tagMap[t] = []);
-
-  const types = parseTags(typeText);
-  const values = parseTags(valueText);
-
-  if (types.length === 1 && values.length > 1) {
-    values.forEach(v => tagMap[types[0]]?.push(v));
-  } else {
-    values.forEach((v, i) => {
-      const type = types[i];
-      if (TAG_TYPES.includes(type)) {
-        tagMap[type].push(v);
-      }
-    });
-  }
-
-  if (!tagMap['分類'].length && category) {
-    tagMap['分類'].push(category);
-  }
-
-  if (!tagMap['歌手'].length && artist) {
-    tagMap['歌手'].push(artist);
-  }
-
-  TAG_TYPES.forEach(t => {
-    tagMap[t] = Array.from(new Set(tagMap[t]));
-  });
-
-  return tagMap;
+    .map(function(t) { return t.trim(); })
+    .filter(function(t) { return t && t !== '-' && t !== '—' && t !== '標籤'; });
 }
 
 function loadSheet() {
@@ -76,40 +42,53 @@ function loadSheet() {
     clearTimeout(sheetTimeout);
 
     try {
-      const rows = response?.table?.rows || [];
+      const rows = response && response.table && response.table.rows ? response.table.rows : [];
       const loadedSongs = [];
+      const masterTags = [];
 
       rows.forEach(function(row) {
         const title = cell(row, 0);
         const artist = cell(row, 1);
         const category = cell(row, 2);
         const link = cell(row, 3);
+        const masterTagCell = cell(row, 5);
 
-        const typeText = cell(row, 5);   // F欄：分類、歌手、風格、語言、其他
-        const valueText = cell(row, 6);  // G欄：對應標籤
+        parseTags(masterTagCell).forEach(function(t) {
+          masterTags.push(t);
+        });
 
         const looksLikeHeader = ['歌名', '歌曲', '曲名', 'title'].includes(title.toLowerCase());
 
         if (title && !looksLikeHeader) {
           loadedSongs.push({
-            title,
+            title: title,
             artist: artist || '未填歌手',
             category: category || '未分類',
-            link: /^https?:\/\//i.test(link) ? link : '',
-            tagMap: buildTagMap(typeText, valueText, category, artist)
+            link: /^https?:\/\//i.test(link) ? link : ''
           });
         }
       });
 
       songs = loadedSongs;
-      status.textContent = '';
-      renderTypes();
-      renderValues();
-      renderSongs();
 
+      if (masterTags.length) {
+        tags = Array.from(new Set(masterTags));
+      } else {
+        const fromSongs = [];
+        songs.forEach(function(s) {
+          parseTags(s.category).forEach(function(t) {
+            fromSongs.push(t);
+          });
+        });
+        tags = Array.from(new Set(fromSongs));
+      }
+
+      status.textContent = '';
+      renderTags();
+      renderSongs();
     } catch (err) {
       console.error(err);
-      showSheetError('試算表格式解析失敗，請確認 F欄是類型、G欄是對應標籤。');
+      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤。');
     } finally {
       delete window[callbackName];
       const s = document.getElementById('sheetJsonp');
@@ -137,61 +116,28 @@ function loadSheet() {
 
 function showSheetError(message) {
   songs = [];
+  tags = [];
   document.getElementById('status').textContent = message;
-  renderTypes();
-  renderValues();
+  renderTags();
   renderSongs();
 }
 
-function renderTypes() {
-  const box = document.getElementById('typeTabs');
+function renderTags() {
+  const box = document.getElementById('tags');
   box.innerHTML = '';
 
-  TAG_TYPES.forEach(function(type) {
-    const b = document.createElement('button');
-    b.className = 'type-tab' + (activeType === type ? ' active' : '');
-    b.textContent = type;
-
-    b.onclick = function() {
-      activeType = type;
-      activeValue = null;
-      renderTypes();
-      renderValues();
-      renderSongs();
-    };
-
-    box.appendChild(b);
-  });
-}
-
-function getValuesByType(type) {
-  const values = [];
-
-  songs.forEach(song => {
-    (song.tagMap[type] || []).forEach(v => values.push(v));
-  });
-
-  return Array.from(new Set(values)).filter(Boolean);
-}
-
-function renderValues() {
-  const box = document.getElementById('valueTags');
-  box.innerHTML = '';
-
-  const values = getValuesByType(activeType);
-
-  values.forEach(function(value, i) {
+  tags.forEach(function(t, i) {
     const colors = palette[i % palette.length];
     const b = document.createElement('button');
 
-    b.className = 'tag' + (activeValue === value ? ' active' : '');
-    b.textContent = value;
+    b.className = 'tag' + (activeTag === t ? ' active' : '');
+    b.textContent = t;
     b.style.setProperty('--tag', colors[0]);
     b.style.setProperty('--tagLight', colors[1]);
 
     b.onclick = function() {
-      activeValue = activeValue === value ? null : value;
-      renderValues();
+      activeTag = activeTag === t ? null : t;
+      renderTags();
       renderSongs();
     };
 
@@ -199,21 +145,11 @@ function renderValues() {
   });
 }
 
-function matchSong(song) {
+function matchSong(s) {
   const q = query.trim().toLowerCase();
-
-  const allTags = TAG_TYPES
-    .flatMap(type => song.tagMap[type] || [])
-    .join(' ');
-
-  const text = (
-    song.title + ' ' +
-    song.artist + ' ' +
-    song.category + ' ' +
-    allTags
-  ).toLowerCase();
-
-  const tagOk = !activeValue || (song.tagMap[activeType] || []).includes(activeValue);
+  const categories = parseTags(s.category);
+  const text = (s.title + ' ' + s.artist + ' ' + s.category).toLowerCase();
+  const tagOk = !activeTag || categories.includes(activeTag) || s.artist === activeTag || s.category.includes(activeTag);
 
   return tagOk && (!q || text.includes(q));
 }
@@ -230,27 +166,22 @@ function renderSongs() {
   count.textContent = '共 ' + list.length + ' 首 / 全部 ' + songs.length + ' 首';
   empty.style.display = list.length ? 'none' : 'block';
 
-  list.forEach(function(song) {
+  list.forEach(function(s) {
     const card = document.createElement('article');
     card.className = 'card';
+    card.dataset.title = s.title;
 
     const title = document.createElement('h3');
     title.className = 'song';
-    title.textContent = song.title;
+    title.textContent = s.title;
 
     const artist = document.createElement('div');
     artist.className = 'artist';
-    artist.textContent = song.artist;
+    artist.textContent = s.artist;
 
     const cat = document.createElement('span');
     cat.className = 'cat';
-
-    const shownTags = [];
-    TAG_TYPES.forEach(type => {
-      (song.tagMap[type] || []).forEach(v => shownTags.push(v));
-    });
-
-    cat.textContent = shownTags.slice(0, 4).join('｜') || song.category || '未分類';
+    cat.textContent = parseTags(s.category).join('　') || '未分類';
 
     const copy = document.createElement('button');
     copy.className = 'copy';
@@ -258,7 +189,7 @@ function renderSongs() {
     copy.textContent = '📋 複製';
 
     copy.onclick = async function() {
-      const text = song.title + ' - ' + song.artist;
+      const text = s.title + ' - ' + s.artist;
 
       try {
         await navigator.clipboard.writeText(text);
@@ -284,9 +215,9 @@ function renderSongs() {
 
     card.append(title, artist, cat, copy);
 
-    if (song.link) {
+    if (s.link) {
       card.addEventListener('dblclick', function() {
-        window.open(song.link, '_blank', 'noopener,noreferrer');
+        window.open(s.link, '_blank', 'noopener,noreferrer');
       });
       card.title = '雙擊開啟歌曲連結';
     }
@@ -300,24 +231,16 @@ document.getElementById('search').addEventListener('input', function(e) {
   renderSongs();
 });
 
-document.getElementById('clearFilters').onclick = function() {
-  activeValue = null;
-  query = '';
-  document.getElementById('search').value = '';
-  renderValues();
-  renderSongs();
-};
-
 document.getElementById('randomBtn').onclick = function(e) {
   e.preventDefault();
 
   const list = songs.filter(matchSong);
   if (!list.length) return;
 
-  const song = list[Math.floor(Math.random() * list.length)];
+  const s = list[Math.floor(Math.random() * list.length)];
 
-  document.getElementById('pickSong').textContent = song.title;
-  document.getElementById('pickArtist').textContent = song.artist + '｜' + (song.category || '未分類');
+  document.getElementById('pickSong').textContent = s.title;
+  document.getElementById('pickArtist').textContent = s.artist + '｜' + (parseTags(s.category).join('　') || '未分類');
   document.getElementById('modal').classList.add('show');
 };
 
