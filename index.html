@@ -15,54 +15,41 @@
 <div class="float-layer" id="floatLayer"></div>
 
 <main class="wrap">
-  <section class="hero">
-    <span class="eyebrow">♫</span>
-    <h1>慌慌の歌單</h1>
-    <p>走過路過歡迎一起來聽首歌吧。</p>
+<section class="hero">
+<span class="eyebrow">♫</span>
+<h1>慌慌の歌單</h1>
+<p>走過路過歡迎一起來聽首歌吧。</p>
 
-    <div class="controls">
-      <input class="search" id="search" placeholder="搜尋歌名、歌手、分類或風格…"/>
-      <button class="random" id="randomBtn" type="button">🎲 隨機抽歌</button>
-    </div>
+<div class="controls">
+<input class="search" id="search" placeholder="搜尋歌名、歌手或標籤…"/>
+<button class="random" id="randomBtn" type="button">🎲 隨機抽歌</button>
+</div>
 
-    <div class="filter-box">
-      <div class="filter-group">
-        <h3>分類</h3>
-        <div class="tags" id="categoryTags"></div>
-      </div>
+<div class="filter-box">
+  <div class="type-tabs" id="typeTabs"></div>
+  <div class="tags" id="valueTags"></div>
+  <button class="clear" id="clearFilters" type="button">清除分類</button>
+</div>
 
-      <div class="filter-group">
-        <h3>歌手</h3>
-        <div class="tags" id="artistTags"></div>
-      </div>
+<div class="meta">
+<span id="count">讀取中…</span>
+<span class="status" id="status"></span>
+</div>
+</section>
 
-      <div class="filter-group">
-        <h3>風格</h3>
-        <div class="tags" id="styleTags"></div>
-      </div>
-
-      <button class="clear" id="clearFilters" type="button">清除分類</button>
-    </div>
-
-    <div class="meta">
-      <span id="count">讀取中…</span>
-      <span class="status" id="status"></span>
-    </div>
-  </section>
-
-  <section class="grid" id="grid"></section>
-  <div class="empty" id="empty">沒有找到符合條件的歌曲</div>
+<section class="grid" id="grid"></section>
+<div class="empty" id="empty">沒有找到符合條件的歌曲</div>
 </main>
 
 <div class="modal" id="modal">
-  <div class="modal-card">
-    <h2>🌸 慌慌推薦</h2>
-    <div class="big" id="pickSong"></div>
-    <div id="pickArtist"></div>
-    <button class="close" id="closeModal" type="button">謝謝尼的瓜單啊！</button>
-  </div>
+<div class="modal-card">
+<h2>🌸 慌慌推薦</h2>
+<div class="big" id="pickSong"></div>
+<div id="pickArtist"></div>
+<button class="close" id="closeModal" type="button">謝謝尼的瓜單啊！</button>
+</div>
 </div>
 
-<script src="./script.js?v=1001"></script>
+<script src="./script.js?v=2000"></script>
 </body>
 </html>
