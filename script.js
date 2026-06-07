@@ -1,10 +1,11 @@
 const SHEET_ID = '1-4mY86ruT2HnTWpPI9MJ9MYPWVTE_Yi3Zoe3PZIMSbs';
 const SHEET_GID = '0';
 
+const TAG_TYPES = ['分類', '歌手', '風格', '語言', '其他'];
+
 let songs = [];
-let activeCategory = null;
-let activeArtist = null;
-let activeStyle = null;
+let activeType = '分類';
+let activeValue = null;
 let query = '';
 let sheetTimeout = null;
 
@@ -12,8 +13,7 @@ const palette = [
   ['#6f8795','#edf3f5'],['#7f9aaa','#eef5f4'],['#8da0b6','#f0f3f8'],
   ['#78918b','#eef4f1'],['#a18f99','#f6f1f4'],['#9b947e','#f5f2ea'],
   ['#8393a0','#eef2f5'],['#7795a3','#edf5f7'],['#8f98aa','#f3f4ee'],
-  ['#9a8e88','#f6f1ed'],['#7189a8','#edf1f8'],['#6d9a98','#edf6f5'],
-  ['#907f9d','#f3eff6'],['#ad928f','#f8f1f0'],['#8ca0a6','#edf3f5']
+  ['#9a8e88','#f6f1ed'],['#7189a8','#edf1f8'],['#6d9a98','#edf6f5']
 ];
 
 function cell(row, i) {
@@ -25,10 +25,41 @@ function parseTags(text) {
   return String(text || '')
     .replace(/[｜|／\/;；、，\n\r]/g, ',')
     .split(',')
-    .map(function(t) { return t.trim(); })
-    .filter(function(t) {
-      return t && t !== '-' && t !== '—' && t !== '標籤' && t !== '風格';
+    .map(t => t.trim())
+    .filter(t => t && t !== '-' && t !== '—');
+}
+
+function buildTagMap(typeText, valueText, category, artist) {
+  const tagMap = {};
+  TAG_TYPES.forEach(t => tagMap[t] = []);
+
+  const types = parseTags(typeText);
+  const values = parseTags(valueText);
+
+  if (types.length === 1 && values.length > 1) {
+    values.forEach(v => tagMap[types[0]]?.push(v));
+  } else {
+    values.forEach((v, i) => {
+      const type = types[i];
+      if (TAG_TYPES.includes(type)) {
+        tagMap[type].push(v);
+      }
     });
+  }
+
+  if (!tagMap['分類'].length && category) {
+    tagMap['分類'].push(category);
+  }
+
+  if (!tagMap['歌手'].length && artist) {
+    tagMap['歌手'].push(artist);
+  }
+
+  TAG_TYPES.forEach(t => {
+    tagMap[t] = Array.from(new Set(tagMap[t]));
+  });
+
+  return tagMap;
 }
 
 function loadSheet() {
@@ -45,38 +76,40 @@ function loadSheet() {
     clearTimeout(sheetTimeout);
 
     try {
-      const rows = response && response.table && response.table.rows ? response.table.rows : [];
+      const rows = response?.table?.rows || [];
       const loadedSongs = [];
 
       rows.forEach(function(row) {
-        const title = cell(row, 0);      // A欄：歌名
-        const artist = cell(row, 1);     // B欄：歌手
-        const category = cell(row, 2);   // C欄：分類
-        const link = cell(row, 3);       // D欄：連結
-        const style = cell(row, 6);      // G欄：風格
+        const title = cell(row, 0);
+        const artist = cell(row, 1);
+        const category = cell(row, 2);
+        const link = cell(row, 3);
+
+        const typeText = cell(row, 5);   // F欄：分類、歌手、風格、語言、其他
+        const valueText = cell(row, 6);  // G欄：對應標籤
 
         const looksLikeHeader = ['歌名', '歌曲', '曲名', 'title'].includes(title.toLowerCase());
 
         if (title && !looksLikeHeader) {
           loadedSongs.push({
-            title: title,
+            title,
             artist: artist || '未填歌手',
             category: category || '未分類',
-            style: style || '',
-            link: /^https?:\/\//i.test(link) ? link : ''
+            link: /^https?:\/\//i.test(link) ? link : '',
+            tagMap: buildTagMap(typeText, valueText, category, artist)
           });
         }
       });
 
       songs = loadedSongs;
-
       status.textContent = '';
-      renderTags();
+      renderTypes();
+      renderValues();
       renderSongs();
 
     } catch (err) {
       console.error(err);
-      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、D欄連結、G欄風格。');
+      showSheetError('試算表格式解析失敗，請確認 F欄是類型、G欄是對應標籤。');
     } finally {
       delete window[callbackName];
       const s = document.getElementById('sheetJsonp');
@@ -105,52 +138,25 @@ function loadSheet() {
 function showSheetError(message) {
   songs = [];
   document.getElementById('status').textContent = message;
-  renderTags();
+  renderTypes();
+  renderValues();
   renderSongs();
 }
 
-function uniqueValues(type) {
-  const values = [];
-
-  songs.forEach(function(s) {
-    if (type === 'category') {
-      parseTags(s.category).forEach(function(t) {
-        values.push(t);
-      });
-    }
-
-    if (type === 'artist') {
-      values.push(s.artist);
-    }
-
-    if (type === 'style') {
-      parseTags(s.style).forEach(function(t) {
-        values.push(t);
-      });
-    }
-  });
-
-  return Array.from(new Set(values)).filter(Boolean);
-}
-
-function renderFilterBox(id, values, activeValue, onClick) {
-  const box = document.getElementById(id);
-  if (!box) return;
-
+function renderTypes() {
+  const box = document.getElementById('typeTabs');
   box.innerHTML = '';
 
-  values.forEach(function(t, i) {
-    const colors = palette[i % palette.length];
+  TAG_TYPES.forEach(function(type) {
     const b = document.createElement('button');
-
-    b.className = 'tag' + (activeValue === t ? ' active' : '');
-    b.textContent = t;
-    b.style.setProperty('--tag', colors[0]);
-    b.style.setProperty('--tagLight', colors[1]);
+    b.className = 'type-tab' + (activeType === type ? ' active' : '');
+    b.textContent = type;
 
     b.onclick = function() {
-      onClick(t);
-      renderTags();
+      activeType = type;
+      activeValue = null;
+      renderTypes();
+      renderValues();
       renderSongs();
     };
 
@@ -158,38 +164,58 @@ function renderFilterBox(id, values, activeValue, onClick) {
   });
 }
 
-function renderTags() {
-  renderFilterBox('categoryTags', uniqueValues('category'), activeCategory, function(t) {
-    activeCategory = activeCategory === t ? null : t;
+function getValuesByType(type) {
+  const values = [];
+
+  songs.forEach(song => {
+    (song.tagMap[type] || []).forEach(v => values.push(v));
   });
 
-  renderFilterBox('artistTags', uniqueValues('artist'), activeArtist, function(t) {
-    activeArtist = activeArtist === t ? null : t;
-  });
+  return Array.from(new Set(values)).filter(Boolean);
+}
 
-  renderFilterBox('styleTags', uniqueValues('style'), activeStyle, function(t) {
-    activeStyle = activeStyle === t ? null : t;
+function renderValues() {
+  const box = document.getElementById('valueTags');
+  box.innerHTML = '';
+
+  const values = getValuesByType(activeType);
+
+  values.forEach(function(value, i) {
+    const colors = palette[i % palette.length];
+    const b = document.createElement('button');
+
+    b.className = 'tag' + (activeValue === value ? ' active' : '');
+    b.textContent = value;
+    b.style.setProperty('--tag', colors[0]);
+    b.style.setProperty('--tagLight', colors[1]);
+
+    b.onclick = function() {
+      activeValue = activeValue === value ? null : value;
+      renderValues();
+      renderSongs();
+    };
+
+    box.appendChild(b);
   });
 }
 
-function matchSong(s) {
+function matchSong(song) {
   const q = query.trim().toLowerCase();
 
-  const categories = parseTags(s.category);
-  const styles = parseTags(s.style);
+  const allTags = TAG_TYPES
+    .flatMap(type => song.tagMap[type] || [])
+    .join(' ');
 
   const text = (
-    s.title + ' ' +
-    s.artist + ' ' +
-    s.category + ' ' +
-    s.style
+    song.title + ' ' +
+    song.artist + ' ' +
+    song.category + ' ' +
+    allTags
   ).toLowerCase();
 
-  const categoryOk = !activeCategory || categories.includes(activeCategory);
-  const artistOk = !activeArtist || s.artist === activeArtist;
-  const styleOk = !activeStyle || styles.includes(activeStyle);
+  const tagOk = !activeValue || (song.tagMap[activeType] || []).includes(activeValue);
 
-  return categoryOk && artistOk && styleOk && (!q || text.includes(q));
+  return tagOk && (!q || text.includes(q));
 }
 
 function renderSongs() {
@@ -204,26 +230,27 @@ function renderSongs() {
   count.textContent = '共 ' + list.length + ' 首 / 全部 ' + songs.length + ' 首';
   empty.style.display = list.length ? 'none' : 'block';
 
-  list.forEach(function(s) {
+  list.forEach(function(song) {
     const card = document.createElement('article');
     card.className = 'card';
-    card.dataset.title = s.title;
 
     const title = document.createElement('h3');
     title.className = 'song';
-    title.textContent = s.title;
+    title.textContent = song.title;
 
     const artist = document.createElement('div');
     artist.className = 'artist';
-    artist.textContent = s.artist;
+    artist.textContent = song.artist;
 
     const cat = document.createElement('span');
     cat.className = 'cat';
 
-    const categoryText = parseTags(s.category).join('　') || '未分類';
-    const styleText = parseTags(s.style).join('　');
+    const shownTags = [];
+    TAG_TYPES.forEach(type => {
+      (song.tagMap[type] || []).forEach(v => shownTags.push(v));
+    });
 
-    cat.textContent = styleText ? categoryText + '｜' + styleText : categoryText;
+    cat.textContent = shownTags.slice(0, 4).join('｜') || song.category || '未分類';
 
     const copy = document.createElement('button');
     copy.className = 'copy';
@@ -231,7 +258,7 @@ function renderSongs() {
     copy.textContent = '📋 複製';
 
     copy.onclick = async function() {
-      const text = s.title + ' - ' + s.artist;
+      const text = song.title + ' - ' + song.artist;
 
       try {
         await navigator.clipboard.writeText(text);
@@ -257,9 +284,9 @@ function renderSongs() {
 
     card.append(title, artist, cat, copy);
 
-    if (s.link) {
+    if (song.link) {
       card.addEventListener('dblclick', function() {
-        window.open(s.link, '_blank', 'noopener,noreferrer');
+        window.open(song.link, '_blank', 'noopener,noreferrer');
       });
       card.title = '雙擊開啟歌曲連結';
     }
@@ -274,14 +301,10 @@ document.getElementById('search').addEventListener('input', function(e) {
 });
 
 document.getElementById('clearFilters').onclick = function() {
-  activeCategory = null;
-  activeArtist = null;
-  activeStyle = null;
+  activeValue = null;
   query = '';
-
   document.getElementById('search').value = '';
-
-  renderTags();
+  renderValues();
   renderSongs();
 };
 
@@ -291,15 +314,10 @@ document.getElementById('randomBtn').onclick = function(e) {
   const list = songs.filter(matchSong);
   if (!list.length) return;
 
-  const s = list[Math.floor(Math.random() * list.length)];
+  const song = list[Math.floor(Math.random() * list.length)];
 
-  const categoryText = parseTags(s.category).join('　') || '未分類';
-  const styleText = parseTags(s.style).join('　');
-
-  document.getElementById('pickSong').textContent = s.title;
-  document.getElementById('pickArtist').textContent =
-    s.artist + '｜' + categoryText + (styleText ? '｜' + styleText : '');
-
+  document.getElementById('pickSong').textContent = song.title;
+  document.getElementById('pickArtist').textContent = song.artist + '｜' + (song.category || '未分類');
   document.getElementById('modal').classList.add('show');
 };
 
