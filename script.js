@@ -2,8 +2,9 @@ const SHEET_ID = '1-4mY86ruT2HnTWpPI9MJ9MYPWVTE_Yi3Zoe3PZIMSbs';
 const SHEET_GID = '0';
 
 let songs = [];
-let tags = [];
-let activeTag = null;
+let activeCategory = null;
+let activeArtist = null;
+let activeStyle = null;
 let query = '';
 let sheetTimeout = null;
 
@@ -25,7 +26,9 @@ function parseTags(text) {
     .replace(/[｜|／\/;；、，\n\r]/g, ',')
     .split(',')
     .map(function(t) { return t.trim(); })
-    .filter(function(t) { return t && t !== '-' && t !== '—' && t !== '標籤'; });
+    .filter(function(t) {
+      return t && t !== '-' && t !== '—' && t !== '標籤' && t !== '風格';
+    });
 }
 
 function loadSheet() {
@@ -44,18 +47,13 @@ function loadSheet() {
     try {
       const rows = response && response.table && response.table.rows ? response.table.rows : [];
       const loadedSongs = [];
-      const masterTags = [];
 
       rows.forEach(function(row) {
-        const title = cell(row, 0);
-        const artist = cell(row, 1);
-        const category = cell(row, 2);
-        const link = cell(row, 3);
-        const masterTagCell = cell(row, 5);
-
-        parseTags(masterTagCell).forEach(function(t) {
-          masterTags.push(t);
-        });
+        const title = cell(row, 0);      // A欄：歌名
+        const artist = cell(row, 1);     // B欄：歌手
+        const category = cell(row, 2);   // C欄：分類
+        const link = cell(row, 3);       // D欄：連結
+        const style = cell(row, 6);      // G欄：風格
 
         const looksLikeHeader = ['歌名', '歌曲', '曲名', 'title'].includes(title.toLowerCase());
 
@@ -64,6 +62,7 @@ function loadSheet() {
             title: title,
             artist: artist || '未填歌手',
             category: category || '未分類',
+            style: style || '',
             link: /^https?:\/\//i.test(link) ? link : ''
           });
         }
@@ -71,24 +70,13 @@ function loadSheet() {
 
       songs = loadedSongs;
 
-      if (masterTags.length) {
-        tags = Array.from(new Set(masterTags));
-      } else {
-        const fromSongs = [];
-        songs.forEach(function(s) {
-          parseTags(s.category).forEach(function(t) {
-            fromSongs.push(t);
-          });
-        });
-        tags = Array.from(new Set(fromSongs));
-      }
-
       status.textContent = '';
       renderTags();
       renderSongs();
+
     } catch (err) {
       console.error(err);
-      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤。');
+      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、D欄連結、G欄風格。');
     } finally {
       delete window[callbackName];
       const s = document.getElementById('sheetJsonp');
@@ -116,27 +104,52 @@ function loadSheet() {
 
 function showSheetError(message) {
   songs = [];
-  tags = [];
   document.getElementById('status').textContent = message;
   renderTags();
   renderSongs();
 }
 
-function renderTags() {
-  const box = document.getElementById('tags');
+function uniqueValues(type) {
+  const values = [];
+
+  songs.forEach(function(s) {
+    if (type === 'category') {
+      parseTags(s.category).forEach(function(t) {
+        values.push(t);
+      });
+    }
+
+    if (type === 'artist') {
+      values.push(s.artist);
+    }
+
+    if (type === 'style') {
+      parseTags(s.style).forEach(function(t) {
+        values.push(t);
+      });
+    }
+  });
+
+  return Array.from(new Set(values)).filter(Boolean);
+}
+
+function renderFilterBox(id, values, activeValue, onClick) {
+  const box = document.getElementById(id);
+  if (!box) return;
+
   box.innerHTML = '';
 
-  tags.forEach(function(t, i) {
+  values.forEach(function(t, i) {
     const colors = palette[i % palette.length];
     const b = document.createElement('button');
 
-    b.className = 'tag' + (activeTag === t ? ' active' : '');
+    b.className = 'tag' + (activeValue === t ? ' active' : '');
     b.textContent = t;
     b.style.setProperty('--tag', colors[0]);
     b.style.setProperty('--tagLight', colors[1]);
 
     b.onclick = function() {
-      activeTag = activeTag === t ? null : t;
+      onClick(t);
       renderTags();
       renderSongs();
     };
@@ -145,13 +158,38 @@ function renderTags() {
   });
 }
 
+function renderTags() {
+  renderFilterBox('categoryTags', uniqueValues('category'), activeCategory, function(t) {
+    activeCategory = activeCategory === t ? null : t;
+  });
+
+  renderFilterBox('artistTags', uniqueValues('artist'), activeArtist, function(t) {
+    activeArtist = activeArtist === t ? null : t;
+  });
+
+  renderFilterBox('styleTags', uniqueValues('style'), activeStyle, function(t) {
+    activeStyle = activeStyle === t ? null : t;
+  });
+}
+
 function matchSong(s) {
   const q = query.trim().toLowerCase();
-  const categories = parseTags(s.category);
-  const text = (s.title + ' ' + s.artist + ' ' + s.category).toLowerCase();
-  const tagOk = !activeTag || categories.includes(activeTag) || s.artist === activeTag || s.category.includes(activeTag);
 
-  return tagOk && (!q || text.includes(q));
+  const categories = parseTags(s.category);
+  const styles = parseTags(s.style);
+
+  const text = (
+    s.title + ' ' +
+    s.artist + ' ' +
+    s.category + ' ' +
+    s.style
+  ).toLowerCase();
+
+  const categoryOk = !activeCategory || categories.includes(activeCategory);
+  const artistOk = !activeArtist || s.artist === activeArtist;
+  const styleOk = !activeStyle || styles.includes(activeStyle);
+
+  return categoryOk && artistOk && styleOk && (!q || text.includes(q));
 }
 
 function renderSongs() {
@@ -181,7 +219,11 @@ function renderSongs() {
 
     const cat = document.createElement('span');
     cat.className = 'cat';
-    cat.textContent = parseTags(s.category).join('　') || '未分類';
+
+    const categoryText = parseTags(s.category).join('　') || '未分類';
+    const styleText = parseTags(s.style).join('　');
+
+    cat.textContent = styleText ? categoryText + '｜' + styleText : categoryText;
 
     const copy = document.createElement('button');
     copy.className = 'copy';
@@ -231,6 +273,18 @@ document.getElementById('search').addEventListener('input', function(e) {
   renderSongs();
 });
 
+document.getElementById('clearFilters').onclick = function() {
+  activeCategory = null;
+  activeArtist = null;
+  activeStyle = null;
+  query = '';
+
+  document.getElementById('search').value = '';
+
+  renderTags();
+  renderSongs();
+};
+
 document.getElementById('randomBtn').onclick = function(e) {
   e.preventDefault();
 
@@ -239,8 +293,13 @@ document.getElementById('randomBtn').onclick = function(e) {
 
   const s = list[Math.floor(Math.random() * list.length)];
 
+  const categoryText = parseTags(s.category).join('　') || '未分類';
+  const styleText = parseTags(s.style).join('　');
+
   document.getElementById('pickSong').textContent = s.title;
-  document.getElementById('pickArtist').textContent = s.artist + '｜' + (parseTags(s.category).join('　') || '未分類');
+  document.getElementById('pickArtist').textContent =
+    s.artist + '｜' + categoryText + (styleText ? '｜' + styleText : '');
+
   document.getElementById('modal').classList.add('show');
 };
 
