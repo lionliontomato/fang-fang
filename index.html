@@ -8,7 +8,7 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet"/>
-<link href="style.css?v=2026060906" rel="stylesheet"/>
+<link href="style.css?v=2026060907" rel="stylesheet"/>
 
 <style>
 body{
@@ -26,11 +26,10 @@ body{
   inset:0;
   pointer-events:none;
   z-index:0;
-  opacity:.55;
   background-image:
-    linear-gradient(rgba(255,255,255,.32) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.24) 1px, transparent 1px);
-  background-size:42px 42px;
+    linear-gradient(rgba(255,255,255,.30) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.22) 1px, transparent 1px);
+  background-size:44px 44px;
 }
 
 .bg-art::before{
@@ -38,48 +37,53 @@ body{
   position:absolute;
   inset:-10%;
   background:
-    radial-gradient(ellipse at 16% 24%, rgba(64,89,105,.18), transparent 28%),
-    radial-gradient(ellipse at 82% 28%, rgba(64,89,105,.12), transparent 25%),
-    radial-gradient(ellipse at 26% 82%, rgba(64,89,105,.11), transparent 26%),
-    radial-gradient(ellipse at 76% 78%, rgba(216,180,160,.14), transparent 28%);
-  filter:blur(34px);
+    radial-gradient(ellipse at 15% 20%, rgba(64,89,105,.18), transparent 30%),
+    radial-gradient(ellipse at 82% 24%, rgba(64,89,105,.12), transparent 24%),
+    radial-gradient(ellipse at 24% 82%, rgba(64,89,105,.10), transparent 26%),
+    radial-gradient(ellipse at 78% 78%, rgba(216,180,160,.12), transparent 28%);
+  filter:blur(42px);
 }
 
 .bg-art::after{
-  content:"雲　山　風　月　花";
+  content:"";
   position:absolute;
-  left:-10%;
-  top:31%;
-  width:120%;
-  text-align:center;
-  color:rgba(64,89,105,.20);
-  font-family:'Noto Serif TC',serif;
-  font-size:clamp(56px,8vw,136px);
-  letter-spacing:58px;
-  transform:rotate(-12deg);
-  white-space:nowrap;
+  inset:0;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(64,89,105,.08), transparent 20%),
+    radial-gradient(circle at 82% 25%, rgba(64,89,105,.06), transparent 18%),
+    radial-gradient(circle at 25% 82%, rgba(64,89,105,.05), transparent 14%),
+    radial-gradient(circle at 80% 76%, rgba(64,89,105,.05), transparent 14%);
+  filter:blur(35px);
 }
 
-.bg-symbols{
+.corner-fan{
   position:fixed;
-  inset:0;
+  right:-80px;
+  bottom:-80px;
+  width:340px;
+  height:340px;
+  border-radius:50%;
   pointer-events:none;
   z-index:0;
+  background:
+    radial-gradient(circle, transparent 58%, rgba(64,89,105,.08) 60%, transparent 62%);
 }
 
-.bg-symbols span{
+.corner-fan::before{
+  content:"";
   position:absolute;
-  color:rgba(64,89,105,.22);
-  font-family:'Noto Serif TC',serif;
-  font-size:clamp(40px,5.5vw,92px);
+  inset:30px;
+  border-radius:50%;
+  border:1px solid rgba(64,89,105,.08);
 }
 
-.bg-symbols span:nth-child(1){left:8%;top:18%;transform:rotate(-18deg)}
-.bg-symbols span:nth-child(2){right:10%;top:22%;transform:rotate(16deg)}
-.bg-symbols span:nth-child(3){left:12%;bottom:18%;transform:rotate(12deg)}
-.bg-symbols span:nth-child(4){right:14%;bottom:16%;transform:rotate(-12deg)}
-.bg-symbols span:nth-child(5){left:47%;top:10%;transform:rotate(8deg);opacity:.7}
-.bg-symbols span:nth-child(6){left:52%;bottom:10%;transform:rotate(-10deg);opacity:.65}
+.corner-fan::after{
+  content:"";
+  position:absolute;
+  inset:60px;
+  border-radius:50%;
+  border:1px solid rgba(64,89,105,.05);
+}
 
 body::before,
 body::after{
@@ -90,14 +94,7 @@ body::after{
 
 <body>
 <div class="bg-art"></div>
-<div class="bg-symbols">
-  <span>花</span>
-  <span>月</span>
-  <span>雲</span>
-  <span>風</span>
-  <span>山</span>
-  <span>詩</span>
-</div>
+<div class="corner-fan"></div>
 
 <div class="float-layer" id="floatLayer"></div>
 
