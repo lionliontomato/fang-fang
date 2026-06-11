@@ -122,14 +122,94 @@ body:after{
 .status{font-size:14px;color:#8a98a0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
 
-.card{position:relative;min-height:150px;padding:22px 18px 56px;border-radius:var(--radius);background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(236,243,246,.72));border:1px solid rgba(255,255,255,.8);box-shadow:0 15px 32px rgba(64,89,105,.12);overflow:hidden;transition:.22s}
-.card:hover{transform:translateY(-4px)}
-.card:after{content:'🌸';position:absolute;right:18px;top:12px;font-size:48px;color:rgba(111,135,149,.12);font-family:serif}
+.card{
+  position:relative;
+  min-height:150px;
+  padding:22px 18px 56px;
+  border-radius:var(--radius);
+  background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(236,243,246,.72));
+  border:1px solid rgba(255,255,255,.8);
+  box-shadow:0 15px 32px rgba(64,89,105,.12);
+  overflow:hidden;
+  transition:.22s;
+  isolation:isolate;
+}
 
-.song{font-family:'Noto Serif TC',serif;font-size:24px;font-weight:700;color:var(--blue-900);margin:0 0 9px}
-.artist{font-size:15px;color:var(--muted);font-weight:700;margin-bottom:12px}
-.cat{display:inline-flex;max-width:100%;padding:6px 11px;border-radius:999px;background:rgba(111,135,149,.13);color:#5e7480;font-size:13px;font-weight:700;line-height:1.5}
-.copy{position:absolute;right:14px;bottom:14px;border:0;border-radius:999px;padding:8px 13px;background:#dae5e9;color:#526b78;font-weight:800;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-4px)}
+
+/* 卡片右上角圖示裝飾 */
+.card:after{
+  content:'🌸';
+  position:absolute;
+  right:15px;
+  top:12px;
+  width:56px;
+  height:56px;
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  background:rgba(111,135,149,.10);
+  border:1px solid rgba(111,135,149,.10);
+  box-shadow:0 10px 22px rgba(64,89,105,.08);
+  font-size:34px;
+  line-height:1;
+  opacity:.42;
+  transform:rotate(-10deg);
+  pointer-events:none;
+  z-index:0;
+  font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+}
+
+.song,
+.artist,
+.cat{
+  position:relative;
+  z-index:1;
+}
+
+.song{
+  font-family:'Noto Serif TC',serif;
+  font-size:24px;
+  font-weight:700;
+  color:var(--blue-900);
+  margin:0 0 9px;
+  padding-right:70px;
+}
+
+.artist{
+  font-size:15px;
+  color:var(--muted);
+  font-weight:700;
+  margin-bottom:12px;
+}
+
+.cat{
+  display:inline-flex;
+  max-width:100%;
+  padding:6px 11px;
+  border-radius:999px;
+  background:rgba(111,135,149,.13);
+  color:#5e7480;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.5;
+}
+
+.copy{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  z-index:2;
+  border:0;
+  border-radius:999px;
+  padding:8px 13px;
+  background:#dae5e9;
+  color:#526b78;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
 .copy:hover{background:#c3d2d9}
 .copy.done{background:#7f9aaa;color:white}
 
@@ -151,4 +231,16 @@ body:after{
   .random{height:50px}
   .grid{grid-template-columns:1fr}
   .tag{padding:10px 13px}
+
+  .card:after{
+    right:14px;
+    top:12px;
+    width:52px;
+    height:52px;
+    font-size:32px;
+  }
+
+  .song{
+    padding-right:64px;
+  }
 }
