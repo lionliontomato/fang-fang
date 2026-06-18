@@ -204,6 +204,33 @@ body::before,
 body::after{
   content:none !important;
 }
+
+.site-footer{
+  position:relative;
+  z-index:2;
+  max-width:980px;
+  margin:40px auto 24px;
+  padding:22px 18px;
+  text-align:center;
+  font-family:"Zen Maru Gothic","Noto Serif TC",serif;
+  color:rgba(48,70,84,.86);
+  font-size:14px;
+  line-height:1.8;
+}
+
+.site-footer p{
+  margin:4px 0;
+}
+
+.site-footer a{
+  color:rgba(48,70,84,.95);
+  text-decoration:none;
+  border-bottom:1px solid rgba(48,70,84,.35);
+}
+
+.site-footer a:hover{
+  opacity:.75;
+}
 </style>
 </head>
 
@@ -241,6 +268,12 @@ body::after{
 <section class="grid" id="grid"></section>
 <div class="empty" id="empty">沒有找到符合條件的歌曲</div>
 </main>
+
+<footer class="site-footer">
+  <p>© 2026 LionLionTomato. All Rights Reserved.</p>
+  <p>本網站內容、版面設計與程式架構未經授權不得重製、改作或商業使用。</p>
+  <p><a href="copyright.html">著作權聲明與使用條款</a></p>
+</footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
