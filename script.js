@@ -29,10 +29,21 @@ function parseTags(text) {
 }
 
 function applySiteSettings(rows) {
-  const title = cell(rows[1], 8) || '慌慌の歌單';
-  const subtitle = cell(rows[2], 8) || '走過路過歡迎一起來聽首歌吧。';
-  const modalTitle = cell(rows[3], 8) || '🌸慌慌推薦';
-  const closeText = cell(rows[4], 8) || '謝謝尼的瓜單啊！';
+  const settings = {};
+
+  rows.forEach(function(row) {
+    const key = cell(row, 7);
+    const value = cell(row, 8);
+
+    if (key && value) {
+      settings[key] = value;
+    }
+  });
+
+  const title = settings['網站標題'] || '慌慌の歌單';
+  const subtitle = settings['網站小標題'] || '走過路過歡迎一起來聽首歌吧。';
+  const modalTitle = settings['抽歌視窗標題'] || '🌸慌慌推薦';
+  const closeText = settings['關閉按鈕文字'] || '謝謝尼的瓜單啊！';
 
   const siteTitle = document.getElementById('siteTitle');
   const siteSubtitle = document.getElementById('siteSubtitle');
@@ -97,11 +108,13 @@ function loadSheet() {
         tags = Array.from(new Set(masterTags));
       } else {
         const fromSongs = [];
+
         songs.forEach(function(s) {
           parseTags(s.category).forEach(function(t) {
             fromSongs.push(t);
           });
         });
+
         tags = Array.from(new Set(fromSongs));
       }
 
@@ -110,9 +123,10 @@ function loadSheet() {
       renderSongs();
     } catch (err) {
       console.error(err);
-      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤。');
+      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤，並確認 H欄/I欄設定文字未合併儲存格。');
     } finally {
       delete window[callbackName];
+
       const s = document.getElementById('sheetJsonp');
       if (s) s.remove();
     }
@@ -241,6 +255,7 @@ function renderSongs() {
       card.addEventListener('dblclick', function() {
         window.open(s.link, '_blank', 'noopener,noreferrer');
       });
+
       card.title = '雙擊開啟歌曲連結';
     }
 
@@ -282,11 +297,13 @@ document.getElementById('modal').onclick = function(e) {
 
   for (let i = 0; i < 28; i++) {
     const el = document.createElement('span');
+
     el.className = 'float';
     el.textContent = symbols[i % symbols.length];
     el.style.setProperty('--left', Math.random() * 100 + '%');
     el.style.setProperty('--dur', (10 + Math.random() * 14) + 's');
     el.style.setProperty('--delay', (-Math.random() * 16) + 's');
+
     layer.appendChild(el);
   }
 })();
