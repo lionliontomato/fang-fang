@@ -28,6 +28,25 @@ function parseTags(text) {
     .filter(function(t) { return t && t !== '-' && t !== '—' && t !== '標籤'; });
 }
 
+function applySiteSettings(rows) {
+  const title = cell(rows[1], 8) || '慌慌の歌單';
+  const subtitle = cell(rows[2], 8) || '走過路過歡迎一起來聽首歌吧。';
+  const modalTitle = cell(rows[3], 8) || '🌸慌慌推薦';
+  const closeText = cell(rows[4], 8) || '謝謝尼的瓜單啊！';
+
+  const siteTitle = document.getElementById('siteTitle');
+  const siteSubtitle = document.getElementById('siteSubtitle');
+  const modalTitleEl = document.getElementById('modalTitle');
+  const closeModal = document.getElementById('closeModal');
+
+  if (siteTitle) siteTitle.textContent = title;
+  if (siteSubtitle) siteSubtitle.textContent = subtitle;
+  if (modalTitleEl) modalTitleEl.textContent = modalTitle;
+  if (closeModal) closeModal.textContent = closeText;
+
+  document.title = title;
+}
+
 function loadSheet() {
   const status = document.getElementById('status');
   status.textContent = '讀取中…';
@@ -43,6 +62,9 @@ function loadSheet() {
 
     try {
       const rows = response && response.table && response.table.rows ? response.table.rows : [];
+
+      applySiteSettings(rows);
+
       const loadedSongs = [];
       const masterTags = [];
 
