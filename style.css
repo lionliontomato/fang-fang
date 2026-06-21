@@ -16,7 +16,7 @@ body{
   overflow-x:hidden;
 
   background-image:
-    linear-gradient(rgba(255,255,255,.46), rgba(255,255,255,.68)),
+    linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.30)),
     url("fang-bg-desktop.png");
   background-size:cover;
   background-position:center top;
@@ -30,7 +30,7 @@ body:after{
   content:none !important;
 }
 
-/* 飄浮小元素：保留，但改成更淡、更慢、更適合新背景 */
+/* 飄浮小元素：保留，但調整成更明顯 */
 .float-layer{
   position:fixed;
   inset:0;
@@ -43,10 +43,10 @@ body:after{
   position:absolute;
   bottom:-8vh;
   left:var(--left);
-  font-size:clamp(16px,2.1vw,28px);
-  opacity:.20;
-  color:rgba(64,89,105,.22);
-  filter:drop-shadow(0 8px 12px rgba(64,89,105,.10));
+  font-size:clamp(20px,2.8vw,38px);
+  opacity:.38;
+  color:rgba(64,89,105,.46);
+  filter:drop-shadow(0 8px 14px rgba(64,89,105,.20));
   animation:rise var(--dur) linear infinite;
   animation-delay:var(--delay);
 }
@@ -58,11 +58,11 @@ body:after{
   }
 
   15%{
-    opacity:.20;
+    opacity:.38;
   }
 
   72%{
-    opacity:.16;
+    opacity:.32;
   }
 
   100%{
@@ -379,11 +379,11 @@ body:after{
   cursor:pointer;
 }
 
-/* 手機版：使用直式背景 */
+/* 手機版：使用直式背景，不要太淡 */
 @media(max-width:768px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.60), rgba(255,255,255,.80)),
+      linear-gradient(rgba(255,255,255,.24), rgba(255,255,255,.42)),
       url("fang-bg-mobile.png");
     background-size:cover;
     background-position:center top;
@@ -392,8 +392,8 @@ body:after{
   }
 
   .float{
-    font-size:clamp(14px,5vw,24px);
-    opacity:.14;
+    font-size:clamp(18px,6vw,30px);
+    opacity:.30;
   }
 }
 
@@ -436,17 +436,17 @@ body:after{
   }
 }
 
-/* 更小手機再加白一點，讓文字更清楚 */
+/* 更小手機也不要太淡，但保留文字可讀性 */
 @media(max-width:480px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.66), rgba(255,255,255,.85)),
+      linear-gradient(rgba(255,255,255,.30), rgba(255,255,255,.50)),
       url("fang-bg-mobile.png");
     background-size:cover;
     background-position:center top;
   }
 
   .float{
-    opacity:.12;
+    opacity:.26;
   }
 }
