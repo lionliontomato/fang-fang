@@ -14,12 +14,13 @@ body{
   color:var(--ink);
   font-family:'Zen Maru Gothic','Noto Serif TC',system-ui,sans-serif;
   overflow-x:hidden;
+  background-color:#eef4f6;
 
-  /* 桌機版背景：只使用一張完整背景，不做補丁，避免分裂 */
+  /* 桌機版背景：改成較完整顯示，避免左下羽球拍看起來怪怪的 */
   background-image:
-    linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.30)),
+    linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.28)),
     url("fang-bg-desktop.png");
-  background-size:cover;
+  background-size:100% auto;
   background-position:center bottom;
   background-repeat:no-repeat;
   background-attachment:fixed;
@@ -31,7 +32,7 @@ body::after{
   content:none !important;
 }
 
-/* 飄浮小元素：保留氛圍，但不要太搶畫面 */
+/* 飄浮小元素 */
 .float-layer{
   position:fixed;
   inset:0;
@@ -44,10 +45,10 @@ body::after{
   position:absolute;
   bottom:-8vh;
   left:var(--left);
-  font-size:clamp(17px,2.2vw,30px);
-  opacity:.22;
-  color:rgba(64,89,105,.28);
-  filter:drop-shadow(0 6px 10px rgba(64,89,105,.10));
+  font-size:clamp(18px,2.5vw,32px);
+  opacity:.30;
+  color:rgba(64,89,105,.36);
+  filter:drop-shadow(0 8px 12px rgba(64,89,105,.14));
   animation:rise var(--dur) linear infinite;
   animation-delay:var(--delay);
 }
@@ -59,11 +60,11 @@ body::after{
   }
 
   18%{
-    opacity:.22;
+    opacity:.30;
   }
 
   72%{
-    opacity:.16;
+    opacity:.22;
   }
 
   100%{
@@ -379,21 +380,29 @@ body::after{
   cursor:pointer;
 }
 
-/* 手機版：使用新版直式背景 */
+/* 平板 */
+@media(max-width:900px){
+  body{
+    background-size:100% auto;
+    background-position:center bottom;
+  }
+}
+
+/* 手機版 */
 @media(max-width:768px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,.40)),
+      linear-gradient(rgba(255,255,255,.20), rgba(255,255,255,.38)),
       url("fang-bg-mobile.png");
-    background-size:cover;
+    background-size:100% auto;
     background-position:center bottom;
     background-repeat:no-repeat;
     background-attachment:scroll;
   }
 
   .float{
-    font-size:clamp(15px,5vw,24px);
-    opacity:.18;
+    font-size:clamp(16px,5vw,26px);
+    opacity:.24;
   }
 }
 
@@ -440,13 +449,13 @@ body::after{
 @media(max-width:480px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.44)),
+      linear-gradient(rgba(255,255,255,.24), rgba(255,255,255,.42)),
       url("fang-bg-mobile.png");
-    background-size:cover;
+    background-size:100% auto;
     background-position:center bottom;
   }
 
   .float{
-    opacity:.16;
+    opacity:.20;
   }
 }
