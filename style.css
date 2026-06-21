@@ -19,13 +19,13 @@ body{
   background-image:
     linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.26)),
     url("fang-bg-desktop.png");
-  background-size:106% auto;
+  background-size:108% auto;
   background-position:center bottom;
   background-repeat:no-repeat;
   background-attachment:fixed;
 }
 
-/* 左右角落補強：讓小狗更往外、更明顯 */
+/* 左右角落補強：再往外推出去，讓小狗與羽球拍更完整 */
 body::before,
 body::after{
   content:"";
@@ -33,21 +33,21 @@ body::after{
   bottom:0;
   pointer-events:none;
   z-index:0;
-  opacity:.95;
-  width:270px;
-  height:230px;
+  opacity:.98;
+  width:320px;
+  height:250px;
   background-image:url("fang-bg-desktop.png");
   background-repeat:no-repeat;
   background-size:100vw auto;
 }
 
 body::before{
-  left:-34px;
+  left:-62px;
   background-position:left bottom;
 }
 
 body::after{
-  right:-34px;
+  right:-62px;
   background-position:right bottom;
 }
 
@@ -401,18 +401,22 @@ body::after{
 
 /* 平板 */
 @media(max-width:900px){
+  body{
+    background-size:110% auto;
+  }
+
   body::before,
   body::after{
-    width:220px;
-    height:195px;
+    width:270px;
+    height:215px;
   }
 
   body::before{
-    left:-28px;
+    left:-52px;
   }
 
   body::after{
-    right:-28px;
+    right:-52px;
   }
 }
 
@@ -422,7 +426,7 @@ body::after{
     background-image:
       linear-gradient(rgba(255,255,255,.20), rgba(255,255,255,.36)),
       url("fang-bg-mobile.png");
-    background-size:108% auto;
+    background-size:112% auto;
     background-position:center bottom;
     background-repeat:no-repeat;
     background-attachment:scroll;
@@ -430,20 +434,20 @@ body::after{
 
   body::before,
   body::after{
-    width:175px;
-    height:165px;
+    width:205px;
+    height:180px;
     background-image:url("fang-bg-mobile.png");
     background-size:100vw auto;
-    opacity:.98;
+    opacity:.99;
   }
 
   body::before{
-    left:-22px;
+    left:-38px;
     background-position:left bottom;
   }
 
   body::after{
-    right:-22px;
+    right:-38px;
     background-position:right bottom;
   }
 
@@ -498,22 +502,22 @@ body::after{
     background-image:
       linear-gradient(rgba(255,255,255,.24), rgba(255,255,255,.42)),
       url("fang-bg-mobile.png");
-    background-size:112% auto;
+    background-size:118% auto;
     background-position:center bottom;
   }
 
   body::before,
   body::after{
-    width:150px;
-    height:145px;
+    width:175px;
+    height:150px;
   }
 
   body::before{
-    left:-18px;
+    left:-34px;
   }
 
   body::after{
-    right:-18px;
+    right:-34px;
   }
 
   .float{
