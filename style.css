@@ -15,22 +15,43 @@ body{
   font-family:'Zen Maru Gothic','Noto Serif TC',system-ui,sans-serif;
   overflow-x:hidden;
 
+  /* 桌機主背景 */
   background-image:
-    linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.30)),
+    linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.26)),
     url("fang-bg-desktop.png");
-  background-size:cover;
-  background-position:center top;
+  background-size:106% auto;
+  background-position:center bottom;
   background-repeat:no-repeat;
   background-attachment:fixed;
 }
 
-/* 移除原本舊背景裝飾，避免蓋住新背景圖 */
-body:before,
-body:after{
-  content:none !important;
+/* 左右角落補強：讓小狗更往外、更明顯 */
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  bottom:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:.95;
+  width:270px;
+  height:230px;
+  background-image:url("fang-bg-desktop.png");
+  background-repeat:no-repeat;
+  background-size:100vw auto;
 }
 
-/* 飄浮小元素：保留，但調整成更明顯 */
+body::before{
+  left:-34px;
+  background-position:left bottom;
+}
+
+body::after{
+  right:-34px;
+  background-position:right bottom;
+}
+
+/* 飄浮小元素：保留氛圍，但不要太搶畫面 */
 .float-layer{
   position:fixed;
   inset:0;
@@ -43,10 +64,10 @@ body:after{
   position:absolute;
   bottom:-8vh;
   left:var(--left);
-  font-size:clamp(20px,2.8vw,38px);
-  opacity:.38;
-  color:rgba(64,89,105,.46);
-  filter:drop-shadow(0 8px 14px rgba(64,89,105,.20));
+  font-size:clamp(17px,2.2vw,30px);
+  opacity:.24;
+  color:rgba(64,89,105,.30);
+  filter:drop-shadow(0 6px 10px rgba(64,89,105,.12));
   animation:rise var(--dur) linear infinite;
   animation-delay:var(--delay);
 }
@@ -57,16 +78,16 @@ body:after{
     opacity:0;
   }
 
-  15%{
-    opacity:.38;
+  18%{
+    opacity:.24;
   }
 
   72%{
-    opacity:.32;
+    opacity:.18;
   }
 
   100%{
-    transform:translateY(-112vh) rotate(220deg);
+    transform:translateY(-112vh) rotate(180deg);
     opacity:0;
   }
 }
@@ -235,7 +256,6 @@ body:after{
   transform:translateY(-4px);
 }
 
-/* 卡片右上角圖示裝飾 */
 .card:after{
   content:'🌸';
   position:absolute;
@@ -379,21 +399,57 @@ body:after{
   cursor:pointer;
 }
 
-/* 手機版：使用直式背景，不要太淡 */
+/* 平板 */
+@media(max-width:900px){
+  body::before,
+  body::after{
+    width:220px;
+    height:195px;
+  }
+
+  body::before{
+    left:-28px;
+  }
+
+  body::after{
+    right:-28px;
+  }
+}
+
+/* 手機版 */
 @media(max-width:768px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.24), rgba(255,255,255,.42)),
+      linear-gradient(rgba(255,255,255,.20), rgba(255,255,255,.36)),
       url("fang-bg-mobile.png");
-    background-size:cover;
-    background-position:center top;
+    background-size:108% auto;
+    background-position:center bottom;
     background-repeat:no-repeat;
     background-attachment:scroll;
   }
 
+  body::before,
+  body::after{
+    width:175px;
+    height:165px;
+    background-image:url("fang-bg-mobile.png");
+    background-size:100vw auto;
+    opacity:.98;
+  }
+
+  body::before{
+    left:-22px;
+    background-position:left bottom;
+  }
+
+  body::after{
+    right:-22px;
+    background-position:right bottom;
+  }
+
   .float{
-    font-size:clamp(18px,6vw,30px);
-    opacity:.30;
+    font-size:clamp(15px,5vw,24px);
+    opacity:.18;
   }
 }
 
@@ -436,17 +492,31 @@ body:after{
   }
 }
 
-/* 更小手機也不要太淡，但保留文字可讀性 */
+/* 更小手機 */
 @media(max-width:480px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.30), rgba(255,255,255,.50)),
+      linear-gradient(rgba(255,255,255,.24), rgba(255,255,255,.42)),
       url("fang-bg-mobile.png");
-    background-size:cover;
-    background-position:center top;
+    background-size:112% auto;
+    background-position:center bottom;
+  }
+
+  body::before,
+  body::after{
+    width:150px;
+    height:145px;
+  }
+
+  body::before{
+    left:-18px;
+  }
+
+  body::after{
+    right:-18px;
   }
 
   .float{
-    opacity:.26;
+    opacity:.16;
   }
 }
