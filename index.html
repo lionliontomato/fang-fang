@@ -4,207 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>慌慌歌單</title>
+
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet"/>
-<link href="style.css?v=2026060911" rel="stylesheet"/>
+
+<link href="style.css?v=20260621b" rel="stylesheet"/>
 
 <style>
-body{
-  background:
-    radial-gradient(circle at 12% 14%, rgba(255,255,255,.50), transparent 18%),
-    radial-gradient(circle at 88% 14%, rgba(203,216,223,.52), transparent 24%),
-    radial-gradient(circle at 15% 78%, rgba(64,89,105,.26), transparent 32%),
-    radial-gradient(circle at 85% 82%, rgba(64,89,105,.20), transparent 30%),
-    linear-gradient(135deg,#d6e1e7 0%,#c3d3dc 35%,#b9cad4 65%,#d4dde2 100%) !important;
-}
-
-.bg-art,
-.bg-blossom,
-.bg-clouds,
-.bg-mountain,
-.bg-racket,
-.bg-shuttle,
-.bg-fan{
-  position:fixed;
-  pointer-events:none;
-  z-index:0;
-}
-
-.bg-art{
-  inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.20) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.16) 1px, transparent 1px);
-  background-size:44px 44px;
-  opacity:.7;
-}
-
-.bg-mountain{
-  left:0;
-  right:0;
-  bottom:0;
-  height:46vh;
-  background:
-    radial-gradient(ellipse at 8% 82%, rgba(64,89,105,.34), transparent 34%),
-    radial-gradient(ellipse at 22% 75%, rgba(64,89,105,.26), transparent 30%),
-    radial-gradient(ellipse at 84% 70%, rgba(64,89,105,.30), transparent 32%),
-    radial-gradient(ellipse at 96% 84%, rgba(64,89,105,.24), transparent 28%),
-    linear-gradient(to top, rgba(64,89,105,.12), transparent 70%);
-  filter:blur(9px);
-}
-
-.bg-clouds{
-  inset:0;
-  opacity:.7;
-  background:
-    radial-gradient(ellipse at 12% 42%, transparent 55%, rgba(111,135,149,.22) 56%, transparent 58%),
-    radial-gradient(ellipse at 88% 34%, transparent 55%, rgba(111,135,149,.18) 56%, transparent 58%),
-    radial-gradient(ellipse at 70% 72%, transparent 55%, rgba(111,135,149,.16) 56%, transparent 58%);
-}
-
-.bg-blossom{
-  left:-20px;
-  top:35px;
-  width:340px;
-  height:240px;
-  opacity:.72;
-  transform:rotate(-12deg);
-}
-
-.bg-blossom::before{
-  content:"";
-  position:absolute;
-  left:10px;
-  top:110px;
-  width:330px;
-  height:3px;
-  background:rgba(64,89,105,.28);
-  transform:rotate(-18deg);
-  transform-origin:left center;
-}
-
-.bg-blossom span{
-  position:absolute;
-  width:26px;
-  height:26px;
-  border-radius:58% 42% 60% 40%;
-  background:rgba(248,245,239,.82);
-  border:1px solid rgba(64,89,105,.16);
-  box-shadow:0 0 0 7px rgba(216,180,160,.10);
-}
-
-.bg-blossom span:nth-child(1){left:42px;top:92px}
-.bg-blossom span:nth-child(2){left:90px;top:68px}
-.bg-blossom span:nth-child(3){left:140px;top:52px}
-.bg-blossom span:nth-child(4){left:190px;top:34px}
-.bg-blossom span:nth-child(5){left:242px;top:20px}
-.bg-blossom span:nth-child(6){left:120px;top:102px}
-.bg-blossom span:nth-child(7){left:214px;top:78px}
-
-.bg-racket{
-  right:-55px;
-  top:92px;
-  width:210px;
-  height:210px;
-  border:3px solid rgba(64,89,105,.28);
-  border-radius:50%;
-  transform:rotate(-28deg);
-  opacity:.82;
-}
-
-.bg-racket::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:100%;
-  width:3px;
-  height:170px;
-  background:rgba(64,89,105,.24);
-  transform:translateX(-50%);
-}
-
-.bg-racket::after{
-  content:"";
-  position:absolute;
-  inset:18px;
-  border-radius:50%;
-  background-image:
-    linear-gradient(rgba(64,89,105,.20) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(64,89,105,.20) 1px, transparent 1px);
-  background-size:18px 18px;
-  mask-image:radial-gradient(circle, black 66%, transparent 68%);
-}
-
-.bg-shuttle{
-  left:28px;
-  bottom:82px;
-  width:120px;
-  height:76px;
-  transform:rotate(-22deg);
-  opacity:.78;
-}
-
-.bg-shuttle::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:24px;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  background:rgba(248,245,239,.88);
-  border:1px solid rgba(64,89,105,.26);
-}
-
-.bg-shuttle::after{
-  content:"";
-  position:absolute;
-  left:34px;
-  top:0;
-  width:86px;
-  height:76px;
-  background:
-    linear-gradient(70deg, transparent 45%, rgba(64,89,105,.28) 46%, transparent 48%),
-    linear-gradient(90deg, transparent 45%, rgba(64,89,105,.22) 46%, transparent 48%),
-    linear-gradient(110deg, transparent 45%, rgba(64,89,105,.28) 46%, transparent 48%),
-    radial-gradient(ellipse at left center, rgba(248,245,239,.78), transparent 72%);
-  clip-path:polygon(0 36%,100% 0,82% 100%,0 64%);
-}
-
-.bg-fan{
-  right:-95px;
-  bottom:-95px;
-  width:390px;
-  height:390px;
-  border-radius:50%;
-  opacity:.92;
-  background:
-    radial-gradient(circle, transparent 57%, rgba(64,89,105,.13) 59%, transparent 61%);
-}
-
-.bg-fan::before{
-  content:"";
-  position:absolute;
-  inset:34px;
-  border-radius:50%;
-  border:1px solid rgba(64,89,105,.13);
-}
-
-.bg-fan::after{
-  content:"";
-  position:absolute;
-  inset:70px;
-  border-radius:50%;
-  border:1px solid rgba(64,89,105,.09);
-}
-
-body::before,
-body::after{
-  content:none !important;
-}
-
 .site-footer{
   position:relative;
   z-index:2;
@@ -235,19 +43,6 @@ body::after{
 </head>
 
 <body>
-<div class="bg-art"></div>
-<div class="bg-mountain"></div>
-<div class="bg-clouds"></div>
-
-<div class="bg-blossom">
-  <span></span><span></span><span></span><span></span>
-  <span></span><span></span><span></span>
-</div>
-
-<div class="bg-racket"></div>
-<div class="bg-shuttle"></div>
-<div class="bg-fan"></div>
-
 <div class="float-layer" id="floatLayer"></div>
 
 <main class="wrap">
@@ -262,7 +57,10 @@ body::after{
 </div>
 
 <div class="tags" id="tags"></div>
-<div class="meta"><span id="count">讀取中…</span><span class="status" id="status"></span></div>
+<div class="meta">
+  <span id="count">讀取中…</span>
+  <span class="status" id="status"></span>
+</div>
 </section>
 
 <section class="grid" id="grid"></section>
