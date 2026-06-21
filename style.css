@@ -15,40 +15,20 @@ body{
   font-family:'Zen Maru Gothic','Noto Serif TC',system-ui,sans-serif;
   overflow-x:hidden;
 
-  /* 桌機主背景 */
+  /* 桌機版背景：只使用一張完整背景，不做補丁，避免分裂 */
   background-image:
-    linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.26)),
+    linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.30)),
     url("fang-bg-desktop.png");
-  background-size:108% auto;
+  background-size:cover;
   background-position:center bottom;
   background-repeat:no-repeat;
   background-attachment:fixed;
 }
 
-/* 左右角落補強：再往外推出去，讓小狗與羽球拍更完整 */
+/* 關掉舊的左右補丁圖層，避免背景分裂 */
 body::before,
 body::after{
-  content:"";
-  position:fixed;
-  bottom:0;
-  pointer-events:none;
-  z-index:0;
-  opacity:.98;
-  width:320px;
-  height:250px;
-  background-image:url("fang-bg-desktop.png");
-  background-repeat:no-repeat;
-  background-size:100vw auto;
-}
-
-body::before{
-  left:-62px;
-  background-position:left bottom;
-}
-
-body::after{
-  right:-62px;
-  background-position:right bottom;
+  content:none !important;
 }
 
 /* 飄浮小元素：保留氛圍，但不要太搶畫面 */
@@ -65,9 +45,9 @@ body::after{
   bottom:-8vh;
   left:var(--left);
   font-size:clamp(17px,2.2vw,30px);
-  opacity:.24;
-  color:rgba(64,89,105,.30);
-  filter:drop-shadow(0 6px 10px rgba(64,89,105,.12));
+  opacity:.22;
+  color:rgba(64,89,105,.28);
+  filter:drop-shadow(0 6px 10px rgba(64,89,105,.10));
   animation:rise var(--dur) linear infinite;
   animation-delay:var(--delay);
 }
@@ -79,11 +59,11 @@ body::after{
   }
 
   18%{
-    opacity:.24;
+    opacity:.22;
   }
 
   72%{
-    opacity:.18;
+    opacity:.16;
   }
 
   100%{
@@ -399,56 +379,16 @@ body::after{
   cursor:pointer;
 }
 
-/* 平板 */
-@media(max-width:900px){
-  body{
-    background-size:110% auto;
-  }
-
-  body::before,
-  body::after{
-    width:270px;
-    height:215px;
-  }
-
-  body::before{
-    left:-52px;
-  }
-
-  body::after{
-    right:-52px;
-  }
-}
-
-/* 手機版 */
+/* 手機版：使用新版直式背景 */
 @media(max-width:768px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.20), rgba(255,255,255,.36)),
+      linear-gradient(rgba(255,255,255,.22), rgba(255,255,255,.40)),
       url("fang-bg-mobile.png");
-    background-size:112% auto;
+    background-size:cover;
     background-position:center bottom;
     background-repeat:no-repeat;
     background-attachment:scroll;
-  }
-
-  body::before,
-  body::after{
-    width:205px;
-    height:180px;
-    background-image:url("fang-bg-mobile.png");
-    background-size:100vw auto;
-    opacity:.99;
-  }
-
-  body::before{
-    left:-38px;
-    background-position:left bottom;
-  }
-
-  body::after{
-    right:-38px;
-    background-position:right bottom;
   }
 
   .float{
@@ -500,24 +440,10 @@ body::after{
 @media(max-width:480px){
   body{
     background-image:
-      linear-gradient(rgba(255,255,255,.24), rgba(255,255,255,.42)),
+      linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.44)),
       url("fang-bg-mobile.png");
-    background-size:118% auto;
+    background-size:cover;
     background-position:center bottom;
-  }
-
-  body::before,
-  body::after{
-    width:175px;
-    height:150px;
-  }
-
-  body::before{
-    left:-34px;
-  }
-
-  body::after{
-    right:-34px;
   }
 
   .float{
