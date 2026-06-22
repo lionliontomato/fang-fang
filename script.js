@@ -1,3 +1,4 @@
+```javascript
 const SHEET_ID = '1-4mY86ruT2HnTWpPI9MJ9MYPWVTE_Yi3Zoe3PZIMSbs';
 const SHEET_GID = '0';
 
@@ -66,7 +67,9 @@ function loadSheet() {
   if (oldScript) oldScript.remove();
 
   const callbackName = 'playlistSheetCallback_' + Date.now();
-  const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?gid=' + SHEET_GID + '&tqx=out:json;responseHandler:' + callbackName + '&t=' + Date.now();
+
+  // 加上 headers=0，避免 Google 試算表自動把第 2 列標籤當成標題列跳過
+  const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?gid=' + SHEET_GID + '&headers=0&tqx=out:json;responseHandler:' + callbackName + '&t=' + Date.now();
 
   window[callbackName] = function(response) {
     clearTimeout(sheetTimeout);
@@ -84,7 +87,7 @@ function loadSheet() {
         const artist = cell(row, 1);
         const category = cell(row, 2);
         const link = cell(row, 3);
-        const masterTagCell = cell(row, 5);
+        const masterTagCell = cell(row, 5); // F欄：上方標籤
 
         parseTags(masterTagCell).forEach(function(t) {
           masterTags.push(t);
@@ -121,6 +124,7 @@ function loadSheet() {
       status.textContent = '';
       renderTags();
       renderSongs();
+
     } catch (err) {
       console.error(err);
       showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤，並確認 H欄/I欄設定文字未合併儲存格。');
@@ -147,6 +151,9 @@ function loadSheet() {
   sheetTimeout = setTimeout(function() {
     showSheetError('讀取試算表逾時，請重新整理頁面或確認試算表權限。');
     delete window[callbackName];
+
+    const s = document.getElementById('sheetJsonp');
+    if (s) s.remove();
   }, 12000);
 }
 
@@ -185,7 +192,12 @@ function matchSong(s) {
   const q = query.trim().toLowerCase();
   const categories = parseTags(s.category);
   const text = (s.title + ' ' + s.artist + ' ' + s.category).toLowerCase();
-  const tagOk = !activeTag || categories.includes(activeTag) || s.artist === activeTag || s.category.includes(activeTag);
+
+  const tagOk =
+    !activeTag ||
+    categories.includes(activeTag) ||
+    s.artist === activeTag ||
+    s.category.includes(activeTag);
 
   return tagOk && (!q || text.includes(q));
 }
@@ -309,3 +321,4 @@ document.getElementById('modal').onclick = function(e) {
 })();
 
 loadSheet();
+```
