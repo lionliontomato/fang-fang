@@ -56,7 +56,7 @@ function applySiteSettings(rows) {
 
   const title = settings['網站標題'] || '慌慌の歌單';
   const subtitle = settings['網站小標題'] || '走過路過歡迎一起來聽首歌吧。';
-  const modalTitle = settings['抽歌視窗標題'] || '慌慌推薦';
+  const modalTitle = settings['抽歌視窗標題'] || '🌸慌慌推薦';
   const closeText = settings['關閉按鈕文字'] || '謝謝尼的瓜單啊！';
 
   const siteTitle = document.getElementById('siteTitle');
@@ -101,6 +101,11 @@ function loadSheet() {
     clearTimeout(sheetTimeout);
 
     try {
+      if (response && response.status && response.status !== 'ok') {
+        showSheetError('試算表讀取失敗，請確認 Google 試算表權限是「知道連結的任何人可檢視」。');
+        return;
+      }
+
       const rows =
         response && response.table && response.table.rows
           ? response.table.rows
@@ -160,9 +165,7 @@ function loadSheet() {
       renderSongs();
     } catch (err) {
       console.error(err);
-      showSheetError(
-        '試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤，並確認 H欄/I欄設定文字未合併儲存格。'
-      );
+      showSheetError('試算表格式解析失敗，請確認 A欄歌名、B欄歌手、C欄分類、F欄標籤。');
     } finally {
       delete window[callbackName];
 
