@@ -42,6 +42,25 @@ function parseTags(text) {
     });
 }
 
+function normalizeSettingKey(value) {
+  return String(value || '')
+    .replace(/[：:]/g, '')
+    .replace(/\s+/g, '')
+    .trim();
+}
+
+function addSetting(settings, key, value) {
+  const normalizedKey = normalizeSettingKey(key);
+  const normalizedValue = String(value || '').trim();
+
+  if (!normalizedKey || !normalizedValue) return;
+
+  if (normalizedKey.includes('網站標題')) settings['網站標題'] = normalizedValue;
+  if (normalizedKey.includes('網站小標題')) settings['網站小標題'] = normalizedValue;
+  if (normalizedKey.includes('抽歌視窗標題')) settings['抽歌視窗標題'] = normalizedValue;
+  if (normalizedKey.includes('關閉按鈕文字')) settings['關閉按鈕文字'] = normalizedValue;
+}
+
 function applySiteSettings(rows) {
   const settings = {};
 
@@ -49,8 +68,18 @@ function applySiteSettings(rows) {
     const key = cell(row, 7);
     const value = cell(row, 8);
 
-    if (key && value) {
-      settings[key] = value;
+    addSetting(settings, key, value);
+
+    for (let i = 0; i < 20; i++) {
+      const current = cell(row, i);
+      const next = cell(row, i + 1);
+
+      addSetting(settings, current, next);
+
+      const inlineMatch = current.match(/^(網站標題|網站小標題|抽歌視窗標題|關閉按鈕文字)\s*[：:]\s*(.+)$/);
+      if (inlineMatch) {
+        addSetting(settings, inlineMatch[1], inlineMatch[2]);
+      }
     }
   });
 
